@@ -45,7 +45,7 @@ export const routes = [
         component: () => import("@/views/home/index"),
         meta: {
           title: "首页",
-          showTabBar: true,
+          showTabBar: false,
         },
       },
       {

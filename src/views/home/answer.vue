@@ -63,38 +63,6 @@
                   class="html-wrap"
                   v-html="decodeTag(matterItem?.matter, item.imgUrlBase)"
                 ></div>
-                <div class="title-tag" v-if="matterItem?.analyze && false">
-                  <span>答案解析</span>
-                </div>
-                <div
-                  class="html-wrap"
-                  v-if="matterItem?.analyze && false"
-                  v-html="decodeTag(matterItem.analyze, item.imgUrlBase)"
-                ></div>
-                <div class="title-tag" v-if="matterItem?.analyzeExtra && false">
-                  <span>拓展解析</span>
-                </div>
-                <div
-                  class="html-wrap"
-                  v-if="matterItem?.analyzeExtra"
-                  v-html="decodeTag(matterItem.analyzeExtra, item.imgUrlBase)"
-                ></div>
-                <div class="title-tag" v-if="matterItem?.standard && false">
-                  <span>评分标准</span>
-                </div>
-                <div
-                  class="html-wrap"
-                  v-if="matterItem?.standard && false"
-                  v-html="decodeTag(matterItem.standard, item.imgUrlBase)"
-                ></div>
-                <div class="title-tag" v-if="matterItem?.notes">
-                  <span>思维导图</span>
-                </div>
-                <div
-                  v-if="matterItem?.notes"
-                  class="html-wrap"
-                  v-html="decodeTag(matterItem?.notes, item.imgUrlBase)"
-                ></div>
               </div>
             </van-tab>
           </van-tabs>
@@ -150,22 +118,6 @@
                 ></span>
               </div>
             </div>
-            <div class="box-wrap desc" v-if="question?.analyze && false">
-              <div class="box-title">解析</div>
-              <div class="box-text" v-html="question.analyze"></div>
-            </div>
-            <div class="box-wrap desc" v-if="question?.analyzeExtra && false">
-              <div class="box-title">拓展</div>
-              <div class="box-text" v-html="question.analyzeExtra"></div>
-            </div>
-            <div class="box-wrap desc" v-if="question?.standard && false">
-              <div class="box-title">评分标准</div>
-              <div class="box-text" v-html="question.standard"></div>
-            </div>
-            <div class="box-wrap desc" v-if="question?.notes && false">
-              <div class="box-title">思维导图</div>
-              <div class="box-text" v-html="question.notes && false"></div>
-            </div>
           </div>
         </div>
       </template>
@@ -192,9 +144,9 @@
               v-for="(it, key) in question.selections"
               :key="key"
               :class="{
-                'correct-answer': question?.answer.includes(it.mark),
+                'correct-answer': answer.includes(it.mark),
               }"
-              @click="handleOption(question, it.mark)"
+              @click="handleOption(it.mark)"
             >
               <!-- √ x  -->
               <div class="selection-key" v-text="it.mark"></div>
@@ -206,101 +158,39 @@
               </div>
 
               <div class="selection-tag">
-                <span
-                  class="correct-answer"
-                  v-if="question?.answer.includes(it.mark)"
+                <span class="correct-answer" v-if="answer.includes(it.mark)"
                   >√</span
                 >
               </div>
             </div>
           </div>
-          <div class="box-wrap" v-if="question?.answer">
+          <div class="box-wrap" v-if="answer">
             <div class="box-text">
               答案：<span
                 class="answer"
-                v-html="decodeTag(question.answer, question.imgUrlBase, false)"
+                v-html="decodeTag(answer, question.imgUrlBase, false)"
               ></span>
             </div>
-          </div>
-          <div class="box-wrap desc" v-if="question?.analyze && false">
-            <div class="box-title">解析</div>
-            <div class="box-text" v-html="question.analyze"></div>
-          </div>
-          <div class="box-wrap desc" v-if="question?.analyzeExtra && false">
-            <div class="box-title">拓展</div>
-            <div class="box-text" v-html="question.analyzeExtra"></div>
           </div>
         </div>
       </template>
     </div>
 
     <div class="control-wrap">
-      <div class="item">上一题</div>
-      <div class="item">
-        <input type="number" v-model="score" />
-        <p class="name">评分</p>
+      <div class="item" @click="handlePrev">上一题</div>
+      <div class="item score-item">
+        <!-- 最大100分 最小0分 只能为整数 -->
+        <input type="number" v-model="score" min="0" max="100" />
       </div>
-      <div class="item">下一题</div>
+      <div class="item" @click="handleSubmit">提交</div>
     </div>
-
-    <!-- 评比 -->
-    <div class="control-wrap" v-if="selectionId && showB">
-      <div class="item" @click="handleGoBack">完成</div>
-      <div class="item blue">
-        <i class="fa fa-thumbs-o-up" v-if="selectionId == 0"> </i>
-        <i
-          class="fa fa-thumbs-up"
-          v-else-if="selectionId == questionList[0].id"
-        ></i>
-        <i
-          class="fa fa-thumbs-down"
-          v-else-if="selectionId == questionList[1].id"
-        ></i>
-        <p class="name">蓝</p>
-      </div>
-      <div class="item vs">VS</div>
-      <div class="item red">
-        <i class="fa fa-thumbs-o-up" v-if="selectionId == 0"> </i>
-        <i
-          class="fa fa-thumbs-up"
-          v-else-if="selectionId == questionList[1].id"
-        ></i>
-        <i
-          class="fa fa-thumbs-down"
-          v-else-if="selectionId == questionList[0].id"
-        ></i>
-        <p class="name">红</p>
-      </div>
-      <div class="item" @click="handleNext">继续评</div>
-    </div>
-    <RemindDialog
-      v-model:show="showExitRemindDialog"
-      :showTag="false"
-      @confirm2="handleExit"
-      @confirm1="handleCancelExit"
-    >
-      <div class="remind-content-wrap">
-        <div class="name">不要走，请投上您神圣的一票吧！</div>
-      </div>
-      <template #button1>
-        <span>继续投票</span>
-      </template>
-      <template #button2>
-        <span>放弃投票</span>
-      </template>
-    </RemindDialog>
   </div>
 </template>
 <script>
 import { reactive, toRefs, onMounted, ref, watch } from "vue";
-import {
-  useRouter,
-  useRoute,
-  onBeforeRouteLeave,
-  createRouter,
-} from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import CopyRight from "@/components/CopyRight";
-import { getAnswerQuestions, doSelection, doAnswer } from "@/api/selection";
+import { getAnswerQuestion, doAnswer } from "@/api/selection";
 
 import RemindDialog from "@/components/RemindDialog";
 import { Toast } from "vant";
@@ -322,41 +212,36 @@ export default {
       showRemindItem: {},
       showExitRemindDialog: false,
       question: {}, // 题目
-      selectionAnswerId: 0, // 选择的题目ID
+      score: 0, // 答题得分
+      answer: "", // 答案内容
       activeMatterIndex: 0, // 当前选中的tab索引
       activeMaterialIndex: 0, // 当前选中的材料tab索引
     });
-    const { treeId, from, type, pkId } = route.query;
+    const { from, answerId } = route.query;
 
     // 获取内容串
     async function init() {
       state.screenWidth = window.innerWidth - 40;
-
       try {
-        const { question, answer, score, selectionAnswerId } =
-          await getAnswerQuestions({
-            treeId,
-            type: type,
-            pkId: pkId ? pkId : 0,
+        const { question, answer, score } = await getAnswerQuestion({
+          answerId,
+        });
+
+        if (!question || !question.id) {
+          router.push({
+            path: "/home",
           });
+          return;
+        }
         // 进行排序
         state.question = question;
         state.answer = answer;
-        state.selectionAnswerId = selectionAnswerId;
+        state.score = score;
       } catch (error) {
         router.push({
           path: "/home",
         });
       }
-    }
-
-    function handleHtml(html) {
-      // 匹配字符串中标签, 匹配并替换所有双引号前的反斜杠
-      const tagReg = /<(.*?)\s(.*?)\>/g;
-      html = html.replace(tagReg, (match, p1) => {
-        return match.replace(/\\\"/g, '"');
-      });
-      return html;
     }
 
     onMounted(() => {
@@ -448,22 +333,39 @@ export default {
     }
 
     // 题目点击
-    async function handleOption(item, remark) {
-      // 提交答案
-      await doAnswer({
-        selectionAnswerId: selectionAnswerId,
-        answer: remark,
-      });
+    async function handleOption(remark) {
+      state.answer = remark;
     }
 
-    function getSelectionStatus(item) {
-      if (state.selectionId == 0) {
-        return false;
+    // 题目点击
+    async function handleSubmit() {
+      if (state.answer === "") {
+        Toast("请填写答案！");
+        return;
       }
-      if (state.selectionId == state.questionList[state.currentSwipeIndex].id) {
-        return true;
+      if (state.score === 0) {
+        Toast("请评分！");
+        return;
       }
-      return false;
+      const { nextAnswerId } = await doAnswer({
+        answerId: answerId,
+        answer: state.answer,
+        score: state.score,
+      });
+
+      setTimeout(() => {
+        router.push({
+          path: "/answer",
+          query: {
+            answerId: nextAnswerId,
+          },
+        });
+        Toast("请开始新一题评论！");
+      }, 500);
+    }
+    //  返回上一题
+    async function handlePrev() {
+      router.go(-1);
     }
     function decodeTag(html, imgUrlBase = "", renderFormulaAsImg = true) {
       if (!html) {
@@ -569,103 +471,13 @@ export default {
       return str;
     }
 
-    // 滑动内容
-    function handleSwipe(index) {
-      state.currentSwipeIndex = index;
-      state.showB = true;
-      state.activeMaterialIndex = 0;
-      state.activeMatterIndex = 0;
-    }
-
-    const swiperRef = ref(null);
-    function changeSwipeIndex(item) {
-      if (item == "A") {
-        swiperRef.value.swipeTo(0);
-      } else if (item == "B") {
-        swiperRef.value.swipeTo(1);
-        state.showB = true;
-      }
-    }
-
-    function handleCancelExit() {
-      state.showExitRemindDialog = false;
-    }
-    function handleExit() {
-      state.showExitRemindDialog = true;
-      window.history.go(-1);
-    }
-
-    function handleGoBack() {
-      if (state.selectionId === 0) {
-        state.showExitRemindDialog = true;
-        return;
-      }
-      window.history.go(-1);
-    }
-    async function handleSelection() {
-      const userSelectionId = state.questionList[state.currentSwipeIndex].id;
-      await doSelection({
-        selectionId: userSelectionId,
-        pkId: state.pkId,
-      });
-
-      if (state.selectionId == 0) {
-        if (state.currentSwipeIndex == 0) {
-          Toast("您已投票给蓝组题目！");
-        } else {
-          Toast("您已投票给红组题目！");
-        }
-      } else {
-        if (state.currentSwipeIndex == 0) {
-          Toast("您将票重新投给蓝组题目！");
-        } else {
-          Toast("您将票重新投给红组题目！");
-        }
-      }
-      state.selectionId = userSelectionId;
-    }
-    async function handleNext() {
-      if (state.selectionId === 0) {
-        Toast("请投票！");
-        return;
-      }
-      const { questionList, selectionPKId } = await getQuestions({
-        treeId: treeId,
-        type: type,
-      });
-      setTimeout(() => {
-        state.questionList = Object.values(questionList);
-        state.questionList.sort((a, b) => a.index - b.index);
-        state.selectionId = 0;
-        state.currentSwipeIndex = 0;
-        state.showB = false;
-        state.pkId = selectionPKId;
-        swiperRef.value.swipeTo(0);
-        Toast("请开始新一组评论！");
-      }, 500);
-    }
-    async function changeMaterial(index) {
-      state.activeMaterialIndex = 1;
-      if (index != 0) {
-        //  state.activeMaterialIndex = index;
-      }
-    }
     return {
-      handleGoBack,
-      handleExit,
-      handleCancelExit,
       ...toRefs(state),
-      handleHtml,
       formattedMaterialParagraphs,
       decodeTag,
-      handleSwipe,
-      changeSwipeIndex,
-      swiperRef,
-      handleSelection,
-      getSelectionStatus,
-      handleNext,
-      changeMaterial,
       handleOption,
+      handleSubmit,
+      handlePrev,
     };
   },
 };
@@ -870,15 +682,15 @@ export default {
         color: #51d5b7;
         border-left: 1px solid #eee;
       }
-      &.blue {
-        color: #51d5b7;
-      }
-      &.red {
-        color: #ee90cf;
-      }
-      &.vs {
-        color: #999;
-        font-weight: 400 !important;
+      &.score-item {
+        input {
+          width: 40px;
+          height: 24px;
+          text-align: center;
+          border: 1px solid #eee;
+          border-radius: 4px;
+          font-size: @font-size-base;
+        }
       }
     }
   }

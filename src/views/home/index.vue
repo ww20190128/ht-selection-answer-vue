@@ -1,92 +1,38 @@
 <template>
   <div class="home-wrap">
     <div class="head-wrap">
-      <div class="info-wrap" v-if="userInfo">
+       <div class="info-wrap" v-if="userInfo">
+        
         <div class="item">
           <div class="num-wrap">
-            <span class="current"> {{ userInfo?.userSelectionNum }} </span> /
-            <span class="max"> {{ userInfo?.selectionLimit }}</span>
-          </div>
-          <p class="text">已投票</p>
-        </div>
-        <div class="item">
-          <div class="num-wrap">
-            <span class="current"> {{ userInfo?.userSelectionTodayNum }}</span
-            ><span class="max">次</span>
-          </div>
-          <p class="text">今日投票</p>
-        </div>
-        <!-- <div class="item">
-          <div class="num-wrap">
-            <span class="current"> {{ userInfo?.userSelectionNum }}</span
+            <span class="current"> {{ userInfo?.answerNum }} / {{ userInfo?.totalNum }}</span
             ><span class="max"> 次</span>
           </div>
-          <p class="text">累积参评</p>
-        </div> -->
+          <p class="text">累积答题</p>
+        </div>
       </div>
     </div>
 
     <div class="contenter-wrap">
       <div
         class="recommend-wrap"
-        v-if="recommend && !titleIsFixed"
+        v-if="!titleIsFixed"
         :class="{ is_fixed: isFixed }"
         id="boxFixed"
       >
-        <div class="name">快速投票</div>
+        <div class="name">快速答题评分</div>
         <div class="content">
           <div class="left">
-            {{ recommend.treeName }} | {{ recommend.typeName }}
+            {{ name }}
           </div>
-          <div
-            class="right"
-            @click="handleRcommend(recommend)"
-            v-if="userInfo?.userSelectionNum < userInfo?.selectionLimit"
-          >
-            投票
+          <div class="right" @click="handleRcommend(answerId)" v-if="answerId">
+            答题评分
           </div>
         </div>
       </div>
-      <div class="content-list-wrap" :class="{ 'content-fixed': isFixed }">
-        <div class="title-wrap" :class="{ 'title-is-fixed': titleIsFixed }">
-          <div
-            class="title"
-            @click="changeSwipeIndex(0)"
-            :class="{ active: activeSwipeIndex === 0 }"
-          >
-            客观题
-          </div>
-          <div
-            class="subhead"
-            @click="changeSwipeIndex(1)"
-            :class="{ active: activeSwipeIndex === 1 }"
-          >
-            主观题
-          </div>
-        </div>
-        <van-swipe
-          indicator-color="#6EA9FB"
-          class="swipe-wrap"
-          :class="{ title_is_fixed: titleIsFixed }"
-          :show-indicators="false"
-          @change="handleSwipe"
-          ref="swiperRef"
-        >
-          <van-swipe-item class="item-list" key="0">
-            <div class="item" v-for="item in classifyList0" :key="item.id">
-              <ClassifyItem :item="item"></ClassifyItem>
-            </div>
-          </van-swipe-item>
-          <!-- 简介 -->
-          <van-swipe-item class="item-list" key="1">
-            <div class="item" v-for="item in classifyList1" :key="item.id">
-              <ClassifyItem :item="item"></ClassifyItem>
-            </div>
-          </van-swipe-item>
-        </van-swipe>
-      </div>
+
       <div class="copy-right-wrap">
-        <p>2025@师资风采大赛</p>
+        <p>2025@答题评分</p>
         <!-- <p>ICP备案/许可证号：鄂ICP备2023021507号-3</p> -->
       </div>
     </div>
@@ -110,7 +56,7 @@ import { useStore } from "@/store";
 import { loadingToast } from "@/plugins/vant";
 import { useWx } from "@/hooks/useWx";
 import { setUserSubject } from "@/api/aiQuestion";
-import { getUserInfo } from "@/api/selection";
+import { getAnswerUserInfo } from "@/api/selection";
 import ClassifyItem from "@/components/ClassifyItem";
 import { useAuth } from "@/hooks/useAuth";
 import { useEventListener } from "@/hooks/useEventListener";
@@ -127,13 +73,11 @@ export default {
       activeSwipeIndex: 0,
       isFixed: false,
       offsetTop: 0,
-      classifyList0: [],
-      classifyList1: [],
-
-      userInfo: {},
-      recommend: {},
+      answerId: 0,
       subjectSetShow: false, // 显示学科设置
       titleIsFixed: false, // 标题是否固定
+      name: "",
+      userInfo:{}
     });
     const { on, off } = useEventListener();
     const store = useStore();
@@ -177,22 +121,18 @@ export default {
       //   state.offsetTop = document.querySelector("#boxFixed")?.offsetTop; // 239
       // });
 
-      const { userInfo, classifyList0, classifyList1, recommend } =
-        await getUserInfo({ userId: userId });
+      const { answerId, name, userInfo } = await getAnswerUserInfo({
+        userId: userId,
+      });
+      state.answerId = answerId;
+      state.name = name;
       state.userInfo = userInfo;
-      state.classifyList0 = classifyList0;
-      state.classifyList1 = classifyList1;
-      state.recommend = recommend;
     }
     // 重新加载数据
     async function reloadSubject(subjectId, force = false) {
-      const { userInfo, classifyList0, classifyList1 } = await setUserSubject({
+      await setUserSubject({
         subjectId,
       });
-
-      state.userInfo = userInfo;
-      state.classifyList0 = classifyList0;
-      state.classifyList1 = classifyList1;
     }
 
     function handleSwipe(index) {
@@ -219,13 +159,12 @@ export default {
       swiperRef.value.swipeTo(index);
     }
 
-    function handleRcommend(item) {
+    function handleRcommend(answerId) {
+      console.log("handleRcommend", answerId);
       router.push({
         path: "/answer",
         query: {
-          treeId: item.treeId,
-          type: item.id,
-          pkId: item?.pkId || "",
+          answerId:answerId,
         },
       });
     }
