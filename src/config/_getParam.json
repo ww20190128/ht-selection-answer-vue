@@ -1,0 +1,122 @@
+[
+    {
+      "value": "shcallback",
+      "type": 1
+    },
+    {
+      "value": "type",
+      "type": 1
+    },
+    {
+      "value": "materialid",
+      "type": 1
+    },
+    {
+      "value": "xmly_callbackurl",
+      "type": 1
+    },
+    {
+      "value": "uctrackid",
+      "type": 1
+    },
+    {
+      "value": "b_track_id",
+      "type": 1
+    },
+    {
+      "value": "soul_callback",
+      "type": 1
+    },
+    {
+      "value": "trackId",
+      "type": 1
+    },
+    {
+      "value": "gdt_vid",
+      "type": 1
+    },
+    {
+      "value": "click_ext",
+      "type": 1
+    },
+    {
+      "value": "qz_gdt",
+      "type": 1
+    },
+    {
+      "value": "mark_id",
+      "type": 1
+    },
+    {
+      "value": "cb",
+      "type": 1
+    },
+    {
+      "value": "pageId",
+      "type": 1
+    },
+    {
+      "value": "lbid",
+      "type": 1
+    },
+    {
+      "value": "tid",
+      "type": 1
+    },
+    {
+      "value": "callback",
+      "type": 1
+    },
+    {
+      "value": "clickid",
+      "type": 1
+    },
+    {
+      "value": "creativetype",
+      "type": 2
+    },
+    {
+      "value": "creativeid",
+      "type": 1
+    },
+    {
+      "value": "adid",
+      "type": 1
+    },
+    {
+      "value": "abc",
+      "type": 1
+    },
+    {
+      "value": "bd_vid",
+      "type": 1
+    },
+    {
+      "value": "source",
+      "type": 2
+    },
+    {
+      "value": "qhclickid",
+      "type": 1
+    },
+    {
+      "value": "plan",
+      "type": 1
+    },
+    {
+      "value": "click_id",
+      "type": 1
+    },
+    {
+      "value": "yk_track_id",
+      "type": 1
+    },
+    {
+      "value": "yk_creative_id",
+      "type": 1
+    },
+    {
+      "value": "qimao_callback",
+      "type": 1
+    }
+  ]
